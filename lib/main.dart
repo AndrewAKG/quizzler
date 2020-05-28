@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import './Question.dart';
+
 void main() => runApp(Quizzler());
 
 class Quizzler extends StatelessWidget {
@@ -33,6 +35,40 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  List<Icon> scoreKeeper = [];
+
+  List<Question> questions = [
+    Question(q: 'Do you love me?', a: false),
+    Question(q: 'Do you hate me?', a: true),
+    Question(q: 'Do you need me?', a: false),
+  ];
+
+  int questionNumber = 0;
+  int userScore = 0;
+  int totalScore = 10;
+
+  void calculateScore(bool userAnswer) {
+    if (questions[questionNumber].answer == userAnswer) {
+      setState(() {
+        scoreKeeper.add(Icon(Icons.check, color: Colors.green));
+        userScore++;
+      });
+    } else {
+      setState(() {
+        scoreKeeper.add(Icon(Icons.close, color: Colors.red));
+      });
+    }
+    if (questionNumber < questions.length - 1) {
+      goToNextQuestion();
+    }
+  }
+
+  void goToNextQuestion() {
+    setState(() {
+      questionNumber++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -45,7 +81,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                questions[questionNumber].question,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -61,15 +97,17 @@ class _QuizPageState extends State<QuizPage> {
             child: FlatButton(
               textColor: Colors.white,
               color: Colors.green,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50)),
               child: Text(
-                'True',
+                'TRUE',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20.0,
                 ),
               ),
               onPressed: () {
-                //The user picked true.
+                calculateScore(true);
               },
             ),
           ),
@@ -79,20 +117,24 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(15.0),
             child: FlatButton(
               color: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(50),
+              ),
               child: Text(
-                'False',
+                'FALSE',
                 style: TextStyle(
                   fontSize: 20.0,
                   color: Colors.white,
                 ),
               ),
               onPressed: () {
-                //The user picked false.
+                calculateScore(false);
               },
             ),
           ),
         ),
         //TODO: Add a Row here as your score keeper
+        Row(children: scoreKeeper),
       ],
     );
   }
